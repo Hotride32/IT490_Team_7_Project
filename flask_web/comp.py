@@ -1,5 +1,3 @@
 import os
-cmd = 'export FLASK_APP=hello'
-os.system(cmd)
-cmd = 'flask run'
+cmd = 'env FLASK_APP=hello flask run'
 os.system(cmd)
