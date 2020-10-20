@@ -19,9 +19,10 @@ def login():
        else:
           user = request.form["username"]
           password = request.form["password"]
-          channel.basic_publish(exchange='', routing_key='user_key', body=user)
+          info = user + password
+          channel.basic_publish(exchange='', routing_key='user_key', body=info)
           print(user)
-          channel.basic_publish(exchange='', routing_key='pass_key', body=password)
+         # channel.basic_publish(exchange='', routing_key='pass_key', body=password)
           connection.close()
           return redirect(url_for("user", usr=user))
     elif request.method == "GET":
