@@ -1,4 +1,5 @@
 from flask import Flask, redirect, url_for, render_template, request
+import pika
 
 app = Flask(__name__)
 
@@ -8,12 +9,18 @@ app = Flask(__name__)
 
 @app.route("/login", methods=["POST", "GET"])
 def login():
+    connection = pika.BlockingConnection( pika.ConnectionParameters(host='localhost'))
+    channel = connection.channel()
+    channel.queue_declare(queue='hello')
     if request.method == "POST":
        if request.form.get("register"):
           return redirect(url_for("register")) 
        else:
           user = request.form["username"]
           password = request.form["password"]
+          channel.basic_publish(exchange='', routing_key='hello', body=user)
+          print(user)
+          connection.close()
           return redirect(url_for("user", usr=user))
     elif request.method == "GET":
           return render_template("index.html")
