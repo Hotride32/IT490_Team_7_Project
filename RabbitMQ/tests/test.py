@@ -26,7 +26,7 @@ def tcp_connect(ip, port_number):
 parser = argparse.ArgumentParser(
         description="Tests containers found on the network")
 parser.add_argument('-i', help="interface to scan", metavar="INTERFACE",
-        default='eth0')
+        default='enp0s3')
 parser.add_argument('-t', help="maximum threads to use", metavar="THREADS",
         default=1000)
 args = parser.parse_args()

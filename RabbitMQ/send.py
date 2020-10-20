@@ -6,6 +6,9 @@ channel = connection.channel()
 
 channel.queue_declare(queue='hello')
 
-channel.basic_publish(exchange='', routing_key='hello', body='Hello World!')
-print(" [x] Sent 'Hello World!'")
+print( "Enter SQL Statement: ")
+bodStr = input()
+
+channel.basic_publish(exchange='', routing_key='hello', body='%r' % bodStr)
+print(" [x] Sent '%r'" % bodStr)
 connection.close()
