@@ -11,15 +11,17 @@ app = Flask(__name__)
 def login():
     connection = pika.BlockingConnection( pika.ConnectionParameters(host='localhost'))
     channel = connection.channel()
-    channel.queue_declare(queue='hello')
+    channel.queue_declare(queue='user_key')
+    channel.queue_declare(queue='pass_key')
     if request.method == "POST":
        if request.form.get("register"):
           return redirect(url_for("register")) 
        else:
           user = request.form["username"]
           password = request.form["password"]
-          channel.basic_publish(exchange='', routing_key='hello', body=user)
+          channel.basic_publish(exchange='', routing_key='user_key', body=user)
           print(user)
+          channel.basic_publish(exchange='', routing_key='pass_key', body=password)
           connection.close()
           return redirect(url_for("user", usr=user))
     elif request.method == "GET":
