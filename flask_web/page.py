@@ -6,10 +6,12 @@ app = Flask(__name__)
 #@app.route("/")
 #def home():
 #    return render_template("index.html")
+#app.run(host='0.0.0.0')
 
 @app.route("/register", methods=["POST", "GET"])
 def register():
-    connection = pika.BlockingConnection( pika.ConnectionParameters(host='localhost'))
+    credentials = pika.PlainCredentials('testuser', 'testuser')
+    connection = pika.BlockingConnection( pika.ConnectionParameters('10.243.84.199',5672,'/',credentials))
     channel = connection.channel()
     channel.queue_declare(queue='user_key')
     channel.queue_declare(queue='pass_key')
