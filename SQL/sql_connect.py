@@ -5,7 +5,8 @@ import mysql.connector, pika, sys, os
 def main():
 
     
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+    credentials = pika.PlainCredentials('testuser', 'testuser')
+    connection = pika.BlockingConnection(pika.ConnectionParameters('10.243.84.199',5672,'/',credentials))
     channel = connection.channel()
 
     channel.queue_declare(queue='user_key')
@@ -32,7 +33,7 @@ def main():
 
 def sql_query(uname, pword):  
 	cnx = mysql.connector.connect(
-		host = "localhost",
+		host = "10.243.82.166",
 		user = "test_user",
 		password = "password",
 		database = "db_test"
