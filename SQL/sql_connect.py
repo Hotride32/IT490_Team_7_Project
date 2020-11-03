@@ -4,8 +4,8 @@ import mysql.connector, pika, sys, os
 
 def main():
 
-    
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+    credentials = pika.PlainCredentials('testuser','testuser')
+    connection = pika.BlockingConnection(pika.ConnectionParameters('10.243.154.71',5672,'/',credentials))
     channel = connection.channel()
 
     channel.queue_declare(queue='user_key')
@@ -14,7 +14,8 @@ def main():
     
     def callback1(ch, method, properties, body):
         print(" [x] Received %r" % body)
-        info = body.split()
+        b = body.decode('utf-8')
+        info = b.split()
         sql_query(info[0], info[1], info[2])
         
         
@@ -39,16 +40,21 @@ def sql_query(opt, uname, pword):
 	)
 	mycursor = cnx.cursor()
 	print("Cursor made")
-	option = opt;
-	email = uname;
-	password = pword;
-	if (option == 'register'):
+	option = '%s' % opt
+	email = uname
+	password = pword
+	print("if")
+	print(option, email, password)
+	if option == 'register':
+		print("Register")
 		query = ("INSERT INTO accounts (email, password) VALUES(%s, %s);")
 		mycursor.execute(query, (uname, pword))
-	elif (option == 'login'):
+	elif option == 'login':
 		query = ("SELECT FROM accounts WHERE (email, password) VALUES(%s,%s);")
 		mycursor.execute(query, (uname, pword))
 		myresult = mycursor.fetchall()
+	else:
+		print("Didnt work")
 	
 	cnx.commit()
 	cnx.close()
