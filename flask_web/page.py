@@ -11,7 +11,7 @@ app = Flask(__name__)
 @app.route("/register", methods=["POST", "GET"])
 def register():
     credentials = pika.PlainCredentials('testuser', 'testuser')
-    connection = pika.BlockingConnection( pika.ConnectionParameters('10.243.154.71',5672,'/',credentials))
+    connection = pika.BlockingConnection( pika.ConnectionParameters('10.243.84.199',5672,'/',credentials))
     channel = connection.channel()
     channel.queue_declare(queue='user_key')
     channel.queue_declare(queue='pass_key')
@@ -44,7 +44,7 @@ def register():
 @app.route("/login", methods=["POST", "GET"])
 def login():
     credentials = pika.PlainCredentials('testuser', 'testuser')
-    connection = pika.BlockingConnection( pika.ConnectionParameters('10.243.154.71',5672,'/',credentials))
+    connection = pika.BlockingConnection( pika.ConnectionParameters('10.243.84.199',5672,'/',credentials))
     channel = connection.channel()
     channel.queue_declare(queue='user_key')
     channel.queue_declare(queue='pass_key')
