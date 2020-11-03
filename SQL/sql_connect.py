@@ -15,7 +15,7 @@ def main():
     def callback1(ch, method, properties, body):
         print(" [x] Received %r" % body)
         info = body.split()
-        sql_query(info[0], info[1])
+        sql_query(info[0], info[1], info[2])
         
         
     def callback2(ch, method, properties, body):
@@ -30,19 +30,26 @@ def main():
     channel.start_consuming()
     #sql_query(user_name, pass_word)
 
-def sql_query(uname, pword):  
+def sql_query(opt, uname, pword):  
 	cnx = mysql.connector.connect(
 		host = "localhost",
 		user = "test_user",
 		password = "password",
 		database = "db_test"
 	)
-	email = uname;
-	password = pword;
-	query = ("INSERT INTO accounts (email, password) VALUES(%s, %s);")
 	mycursor = cnx.cursor()
 	print("Cursor made")
-	mycursor.execute(query, (uname, pword))
+	option = opt;
+	email = uname;
+	password = pword;
+	if (option == 'register'):
+		query = ("INSERT INTO accounts (email, password) VALUES(%s, %s);")
+		mycursor.execute(query, (uname, pword))
+	elif (option == 'login'):
+		query = ("SELECT FROM accounts WHERE (email, password) VALUES(%s,%s);")
+		mycursor.execute(query, (uname, pword))
+		myresult = mycursor.fetchall()
+	
 	cnx.commit()
 	cnx.close()
 	
