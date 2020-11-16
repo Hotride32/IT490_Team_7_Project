@@ -38,7 +38,7 @@ def register():
           connection.close()
           return redirect(url_for("user", usr=user))
     elif request.method == "GET":
-          return render_template("index.html")
+          return render_template("register.html")
     
 
 @app.route("/login", methods=["POST", "GET"])
