@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      .alert-error {
+        padding: 8px;
+        background-color: red;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Flashing messages</h1>
+    {% for message in get_flashed_messages() %}
+      <div class="alert-error">Error: {{ message }}</div>
+    {% endfor %}
+  </body>
+</html>

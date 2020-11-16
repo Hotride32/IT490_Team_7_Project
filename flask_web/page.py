@@ -3,9 +3,9 @@ import pika
 
 app = Flask(__name__)
 
-#@app.route("/")
-#def home():
-#    return render_template("index.html")
+@app.route("/")
+def home():
+   return render_template("index.html")
 #app.run(host='0.0.0.0')
 
 @app.route("/register", methods=["POST", "GET"])
@@ -66,11 +66,11 @@ def login():
 
           def check(work):
              if(work == 'logged'):
-                 # flash('You were successfully logged in')
-                  return redirect(url_for("user", usr=work))
+                  flash('You were successfully logged in')
+                  #return redirect(url_for("user", usr=work))
              else:
-                 # flash('Can not logged in')
-                  return redirect(url_for("user", usr="failed"))
+                  flash('Can not logged in')
+                  #return redirect(url_for("user", usr="failed"))
 
 
 
@@ -86,6 +86,7 @@ def login():
           
 
           connection.close()
+          return render_template("logged.html")
           #return redirect(url_for("user", usr=user))
     elif request.method == "GET":
           return render_template("login.html")
