@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title> Vedelem</title>
+  <meta charset="utf-8">
+  <meta name="description" content="Leaderboard">
+  <meta name="author" content="Chris Ramirez">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Roboto" rel="stylesheet">
+  <link rel="stylesheet" href="w3-theme-blue.css">
+  <link rel="stylesheet" href="Test.css">
+  <link rel="stylesheet" href="w3.css">
+</head>
+
+<body>
+
+  <div class="w3-sidebar w3-bar-block w3-card w3-theme-d2 w3-center w3-xlarge" style="width:15%">
+    <h3 class="w3-bar-item w3-xxxlarge " >Content</h3>
+    <a href="Leaderboard.html" class="w3-bar-item w3-button w3-padding-16 w3-theme-d3">Leaderboard</a>
+    <a href="Player.html" class="w3-bar-item w3-button w3-padding-16">Login</a>
+    <a href="CreateAccount.html" class="w3-bar-item w3-button w3-padding-16">Login</a>
+  </div>
+
+  <div style="margin-left:15%">
+
+    <div class="w3-container">
+      <div class="w3-card-4">
+        <header class="w3-container w3-theme-d1 w3-center">
+          <h1 class="w3-xxxlarge w3-myfont"> Vedelem </h1>
+        </header>
+      </div>
+    </div>
+
+    <div class="w3-container w3-padding-16">
+
+      <input class="w3-input w3-border w3-padding" type="text" placeholder='Search for names..'id="myInput" onkeyup="filter()">
+
+      <table class="w3-table-all w3-card-4 w3-centered w3-hoverable" id="myTable">
+        <tr class="w3-blue w3-xlarge">
+          <th>Rank</th>
+          
+          <th>Name</th>
+          <th>Score</th>
+        </tr>
+        <tr>
+          <td>1</td>
+          
+          <td>Test Name</td>
+          <td>1000</td>
+        </tr>
+        
+      </table>
+
+    </div>
+  </div>
+
+</body>
+
+<script>
+
+function filter() {
+  var input, filter, table, tr, td, i;
+  input = document.getElementById("myInput");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("myTable");
+  tr = table.getElementsByTagName("tr");
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[2];
+    if (td) {
+      if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+</script>
+
+</html>
