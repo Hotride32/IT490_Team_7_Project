@@ -1,4 +1,4 @@
-from flask import Flask, redirect, url_for, render_template, request
+from flask import Flask, redirect, url_for, render_template, request, json
 import pika
 
 app = Flask(__name__)
@@ -66,10 +66,18 @@ def login():
 
           def check(work):
              if(work == 'logged'):
+                  print("successful log in")
                   flash('You were successfully logged in')
+                  connection.close()
+                  return render_template("logged.html")
+
                   #return redirect(url_for("user", usr=work))
              else:
-                  flash('Can not logged in')
+                  print(" failed log in")
+                  flash('Can not log in')
+                  connection.close()
+                  return render_template("logged.html")
+
                   #return redirect(url_for("user", usr="failed"))
 
 
@@ -91,6 +99,17 @@ def login():
     elif request.method == "GET":
           return render_template("login.html")
     
+@app.route("/leaderboard", methods =["GET"])
+def leaderboard():
+    scores = [1.0,2.0,3.0]
+    #names = ["name" : "12-31-18", " name" : "01-01-19", "name" : "01-02-19"] 
+    names = [{ "name": "abc", "age": 50 },{ "age": "25", "hobby": "swimming" },  { "name": "xyz", "hobby": "programming" }];
+
+    data = json.dumps( scores )
+    labels = json.dumps( names )
+    print(labels)
+    return render_template("Leaderboard.html", data=data, labels=labels)
+
 @app.route("/<usr>")
 def user(usr):
     return f"<h1>{usr}</h1>"
