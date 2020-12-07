@@ -14,13 +14,13 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 </head>
 
-<body onLoad="buildHtmlTable('#excelDataTable')">
+<body onLoad="buildHtmlTable('#myTable')">
 
   <div class="w3-sidebar w3-bar-block w3-card w3-theme-d2 w3-center w3-xlarge" style="width:15%">
     <h3 class="w3-bar-item w3-xxxlarge " >Content</h3>
-    <a href="Leaderboard.html" class="w3-bar-item w3-button w3-padding-16 w3-theme-d3">Leaderboard</a>
-    <a href="Player.html" class="w3-bar-item w3-button w3-padding-16">Login</a>
-    <a href="CreateAccount.html" class="w3-bar-item w3-button w3-padding-16">Login</a>
+    <a href="leaderboard" class="w3-bar-item w3-button w3-padding-16 w3-theme-d3">Leaderboard</a>
+    <a href="register" class="w3-bar-item w3-button w3-padding-16">Register</a>
+    <a href="login" class="w3-bar-item w3-button w3-padding-16">Login</a>
   </div>
 
   <canvas id="line-chart" width="3" height="1"></canvas>
@@ -44,7 +44,7 @@
 
       <table class="w3-table-all w3-card-4 w3-centered w3-hoverable" id="myTable">
         <tr class="w3-blue w3-xlarge">
-          <th>Rank</th>
+         <!-- <th>Rank</th>
           
           <th>Name</th>
           <th>Score</th>
@@ -55,7 +55,7 @@
           <td>Test Name</td>
           <td>1000</td>
         </tr>
-        
+        -->
       </table>
 
     </div>
@@ -63,6 +63,15 @@
  <p id="demo"></p>
  <table id="excelDataTable" border="1">
   </table>
+ <br><br>
+ <form action="#" method="post">
+        USERNAME&nbsp <input type = text placeholder="Input username" name = "username" id = "username"><br><br>
+        PASSWORD&nbsp <input type = text placeholder="Input password" name = "password" id = "password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"><br><br>
+        SCORE&nbsp <input type = text placeholder="Input score" name = "score" id = "score"><br><br>
+
+
+
+ <input type = submit name = "score" value="Enter Score">
 </body>
 
 <script>
@@ -74,7 +83,7 @@ function filter() {
   table = document.getElementById("myTable");
   tr = table.getElementsByTagName("tr");
   for (i = 0; i < tr.length; i++) {
-    td = tr[i].getElementsByTagName("td")[2];
+    td = tr[i].getElementsByTagName("td")[0];
     if (td) {
       if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
         tr[i].style.display = "";
@@ -90,13 +99,15 @@ data = JSON.parse({{ data | tojson }})
 */
 
 function buildHtmlTable(selector) {
-  labels = JSON.parse({{ labels | tojson }})
+  labels = JSON.parse({{ labels | tojson }});
+  /*labels = JSON.parse(myList);*/
+  console.log(labels);
   var columns = addAllColumnHeaders(labels, selector);
 
   for (var i = 0; i < labels.length; i++) {
     var row$ = $('<tr/>');
     for (var colIndex = 0; colIndex < columns.length; colIndex++) {
-      var cellValue = myList[i][columns[colIndex]];
+      var cellValue = labels[i][columns[colIndex]];
       if (cellValue == null) cellValue = "";
       row$.append($('<td/>').html(cellValue));
     }
@@ -118,10 +129,10 @@ var myList = [
 function addAllColumnHeaders(myList, selector) {
   var columnSet = [];
   var headerTr$ = $('<tr/>');
-  labels = JSON.parse({{ labels | tojson }})
+  labels = JSON.parse({{labels | tojson }});
 
   for (var i = 0; i < labels.length; i++) {
-    var rowHash = myList[i];
+    var rowHash = labels[i];
     for (var key in rowHash) {
       if ($.inArray(key, columnSet) == -1) {
         columnSet.push(key);

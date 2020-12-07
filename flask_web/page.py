@@ -45,6 +45,7 @@ def register():
 def login():
     credentials = pika.PlainCredentials('testuser', 'testuser')
     connection = pika.BlockingConnection( pika.ConnectionParameters('10.243.84.199',5672,'/',credentials))
+    #cconnection = pika.BlockingConnection( pika.ConnectionParameters('127.0.0.1'))
     channel = connection.channel()
     channel.queue_declare(queue='user_key')
     channel.queue_declare(queue='pass_key')
@@ -57,25 +58,22 @@ def login():
           info = 'login' + ' ' +  user + ' ' + password
           channel.basic_publish(exchange='', routing_key='user_key', body=info)
 
-          #connection.close()
+          
 
-          #credentials = pika.PlainCredentials('testuser', 'testuser')
-          #connection = pika.BlockingConnection( pika.ConnectionParameters('10.243.154.71',5672,'/',credentials))
-          #channel = connection.channel()
           channel.queue_declare(queue='access')
 
           def check(work):
              if(work == 'logged'):
                   print("successful log in")
                   flash('You were successfully logged in')
-                  connection.close()
+                  #connection.close()
                   return render_template("logged.html")
 
                   #return redirect(url_for("user", usr=work))
              else:
-                  print(" failed log in")
-                  flash('Can not log in')
-                  connection.close()
+                  print('failed log in')
+                  flash('Incorrect log in')
+                  #connection.close()
                   return render_template("logged.html")
 
                   #return redirect(url_for("user", usr="failed"))
@@ -103,11 +101,11 @@ def login():
 def leaderboard():
     scores = [1.0,2.0,3.0]
     #names = ["name" : "12-31-18", " name" : "01-01-19", "name" : "01-02-19"] 
-    names = [{ "name": "abc", "age": 50 },{ "age": "25", "hobby": "swimming" },  { "name": "xyz", "hobby": "programming" }];
+    names = [{ "Name": "abc", "Rank": 50 , "Score": 5000 },{ "Rank": "25", "Name": "swimming", "Score": 2043 },  { "Name": "xyz", "Rank": "2", "Score": 500 }];
 
     data = json.dumps( scores )
     labels = json.dumps( names )
-    print(labels)
+    #print(labels)
     return render_template("Leaderboard.html", data=data, labels=labels)
 
 @app.route("/<usr>")
