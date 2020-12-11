@@ -12,10 +12,11 @@
   <link rel="stylesheet" href="Test.css">
   <link rel="stylesheet" href="w3.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="sorttable.js"></script>
 </head>
-
+<!--
 <body onLoad="buildHtmlTable('#myTable')">
-
+-->
   <div class="w3-sidebar w3-bar-block w3-card w3-theme-d2 w3-center w3-xlarge" style="width:15%">
     <h3 class="w3-bar-item w3-xxxlarge " >Content</h3>
     <a href="leaderboard" class="w3-bar-item w3-button w3-padding-16 w3-theme-d3">Leaderboard</a>
@@ -24,7 +25,17 @@
   </div>
 
   <canvas id="line-chart" width="3" height="1"></canvas>
+  
+  <br><br>
+  <form action="#" method="post">
+        USERNAME&nbsp <input type = text placeholder="Input username" name = "username" id = "username"><br><br>
+        PASSWORD&nbsp <input type = text placeholder="Input password" name = "password" id = "password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"><br><br>
+        SCORE&nbsp <input type = number placeholder="Input score" name = "score" id = "score"><br><br>
 
+
+
+  <input type = submit name = "score" value="Enter Score">
+  </form>
 
   <div style="margin-left:15%">
 
@@ -36,19 +47,22 @@
       </div>
     </div>
 
-
+  <!--  <p><button onclick="sortTable()">Refresh</button></p> -->
 
     <div class="w3-container w3-padding-16">
 
       <input class="w3-input w3-border w3-padding" type="text" placeholder='Search for names..'id="myInput" onkeyup="filter()">
 
-      <table class="w3-table-all w3-card-4 w3-centered w3-hoverable" id="myTable">
+      <table class="w3-table-all w3-card-4 w3-centered w3-hoverable sortable" id="myTable">
+        <!--<thead>
         <tr class="w3-blue w3-xlarge">
-         <!-- <th>Rank</th>
+         <th>Name</th>
           
-          <th>Name</th>
+          <th id="rank">Rank</th>
           <th>Score</th>
         </tr>
+        </thead>-->
+        <!--
         <tr>
           <td>1</td>
           
@@ -57,24 +71,30 @@
         </tr>
         -->
       </table>
-
+      <p>
+      <!--  <button onclick="sorttable.innerSortFunction.apply(document.getElementById('rank'), [])">Sort by 'Rank' column</button> -->
+      <p>
     </div>
   </div>
  <p id="demo"></p>
  <table id="excelDataTable" border="1">
   </table>
- <br><br>
- <form action="#" method="post">
-        USERNAME&nbsp <input type = text placeholder="Input username" name = "username" id = "username"><br><br>
-        PASSWORD&nbsp <input type = text placeholder="Input password" name = "password" id = "password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"><br><br>
-        SCORE&nbsp <input type = text placeholder="Input score" name = "score" id = "score"><br><br>
-
-
-
- <input type = submit name = "score" value="Enter Score">
 </body>
-
 <script>
+
+window.onload=function(){
+buildHtmlTable('#myTable');
+/*document.getElementsByTagName("th")[0].setAttribute("id", "democlass");*/
+onLoad();
+
+
+}
+
+function onLoad(){
+    var newTableObject = document.getElementById("myTable")
+    sorttable.makeSortable(newTableObject)
+}
+
 
 function filter() {
   var input, filter, table, tr, td, i;
@@ -113,6 +133,7 @@ function buildHtmlTable(selector) {
     }
     $(selector).append(row$);
   }
+ /*sorttable.makeSortable(document.getElementById('myTable'));*/
 }
 
 /*
@@ -141,8 +162,44 @@ function addAllColumnHeaders(myList, selector) {
     }
   }
   $(selector).append(headerTr$);
-
+  /*sorttable.makeSortable(document.getElementById('myTable'));*/
   return columnSet;
+  
+}
+
+function sortTable() {
+  var table, rows, switching, i, x, y, shouldSwitch;
+  table = document.getElementById("myTable");
+  switching = true;
+  /*Make a loop that will continue until
+  no switching has been done:*/
+  while (switching) {
+    //start by saying: no switching is done:
+    switching = false;
+    rows = table.rows;
+    /*Loop through all table rows (except the
+    first, which contains table headers):*/
+    for (i = 1; i < (rows.length - 1); i++) {
+      //start by saying there should be no switching:
+      shouldSwitch = false;
+      /*Get the two elements you want to compare,
+      one from current row and one from the next:*/
+      x = rows[i].getElementsByTagName("TD")[1];
+      y = rows[i + 1].getElementsByTagName("TD")[1];
+      //check if the two rows should switch place:
+      if (Number(x.innerHTML) > Number(y.innerHTML)) {
+        //if so, mark as a switch and break the loop:
+        shouldSwitch = true;
+        break;
+      }
+    }
+    if (shouldSwitch) {
+      /*If a switch has been marked, make the switch
+      and mark that a switch has been done:*/
+      rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+      switching = true;
+    }
+  }
 }
 
 /*

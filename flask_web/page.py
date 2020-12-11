@@ -1,7 +1,8 @@
-from flask import Flask, redirect, url_for, render_template, request, json
+from flask import Flask, redirect, url_for, render_template, request, json, flash
 import pika
 
 app = Flask(__name__)
+app.secret_key = "super secret key"
 
 @app.route("/")
 def home():
@@ -51,7 +52,7 @@ def login():
     channel.queue_declare(queue='pass_key')
     if request.method == "POST":
        if request.form.get("register"):
-          return redirect(url_for("register")) 
+          return redirect(url_for("register"))
        else:
           user = request.form["username"]
           password = request.form["password"]
@@ -67,15 +68,15 @@ def login():
                   print("successful log in")
                   flash('You were successfully logged in')
                   #connection.close()
+                  #return redirect(url_for("logged")
                   return render_template("logged.html")
-
                   #return redirect(url_for("user", usr=work))
              else:
                   print('failed log in')
                   flash('Incorrect log in')
                   #connection.close()
+                  #return redirect(url_for("logged")
                   return render_template("logged.html")
-
                   #return redirect(url_for("user", usr="failed"))
 
 
@@ -89,9 +90,9 @@ def login():
           channel.basic_consume(queue='access', on_message_callback=callback2, auto_ack=True)
           channel.start_consuming()
 
-          
 
           connection.close()
+          #return redirect(url_for("logged")
           return render_template("logged.html")
           #return redirect(url_for("user", usr=user))
     elif request.method == "GET":
@@ -101,7 +102,7 @@ def login():
 def leaderboard():
     scores = [1.0,2.0,3.0]
     #names = ["name" : "12-31-18", " name" : "01-01-19", "name" : "01-02-19"] 
-    names = [{ "Name": "abc", "Rank": 50 , "Score": 5000 },{ "Rank": "25", "Name": "swimming", "Score": 2043 },  { "Name": "xyz", "Rank": "2", "Score": 500 }];
+    names = [{ "Name": "zbc", "Rank": 50 , "Score": 5000 },{ "Rank": "25", "Name": "swimming", "Score": 2043 },  { "Name": "xyz", "Rank": "2", "Score": 500 }];
 
     data = json.dumps( scores )
     labels = json.dumps( names )
@@ -111,6 +112,11 @@ def leaderboard():
 @app.route("/<usr>")
 def user(usr):
     return f"<h1>{usr}</h1>"
+
+@app.route("/logged")
+def logged():
+    #flash('You were successfully logged in')
+    return render_template("logged.html")
 
 if __name__ == "__main__":
     app.run(debug=True)
