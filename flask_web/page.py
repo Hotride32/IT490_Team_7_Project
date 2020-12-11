@@ -12,7 +12,8 @@ def home():
 @app.route("/register", methods=["POST", "GET"])
 def register():
     credentials = pika.PlainCredentials('testuser', 'testuser')
-    connection = pika.BlockingConnection( pika.ConnectionParameters('10.243.84.199',5672,'/',credentials))
+    #connection = pika.BlockingConnection( pika.ConnectionParameters('10.243.84.199',5672,'/',credentials)) #Steve
+    connection = pika.BlockingConnection( pika.ConnectionParameters('10.243.154.71',5672,'/',credentials)) #Z
     channel = connection.channel()
     channel.queue_declare(queue='user_key')
     channel.queue_declare(queue='pass_key')
@@ -45,9 +46,10 @@ def register():
 @app.route("/login", methods=["POST", "GET"])
 def login():
     credentials = pika.PlainCredentials('testuser', 'testuser')
-    connection = pika.BlockingConnection( pika.ConnectionParameters('10.243.84.199',5672,'/',credentials))
-    #cconnection = pika.BlockingConnection( pika.ConnectionParameters('127.0.0.1'))
+    #connection = pika.BlockingConnection( pika.ConnectionParameters('10.243.84.199',5672,'/',credentials)) #Steve
+    connection = pika.BlockingConnection( pika.ConnectionParameters('10.243.154.71',5672,'/',credentials)) #Z
     channel = connection.channel()
+    message = '';
     channel.queue_declare(queue='user_key')
     channel.queue_declare(queue='pass_key')
     if request.method == "POST":
@@ -59,49 +61,41 @@ def login():
           info = 'login' + ' ' +  user + ' ' + password
           channel.basic_publish(exchange='', routing_key='user_key', body=info)
 
-          
 
           channel.queue_declare(queue='access')
 
           def check(work):
              if(work == 'logged'):
                   print("successful log in")
+                  message = 'successful log in'
                   flash('You were successfully logged in')
-                  #connection.close()
-                  #return redirect(url_for("logged")
-                  return render_template("logged.html")
-                  #return redirect(url_for("user", usr=work))
              else:
                   print('failed log in')
+                  message = 'failed log in'
                   flash('Incorrect log in')
-                  #connection.close()
-                  #return redirect(url_for("logged")
-                  return render_template("logged.html")
-                  #return redirect(url_for("user", usr="failed"))
 
 
 
           def callback2(ch, method, properties, body):
               print(" [x] Received %r" % body)
               l = body.decode('utf-8')
-              return check(l)
-
+              check(l)
+              #print("end of callback")
+              channel.stop_consuming()
 
           channel.basic_consume(queue='access', on_message_callback=callback2, auto_ack=True)
           channel.start_consuming()
 
 
           connection.close()
-          #return redirect(url_for("logged")
           return render_template("logged.html")
-          #return redirect(url_for("user", usr=user))
     elif request.method == "GET":
           return render_template("login.html")
-    
-@app.route("/leaderboard", methods =["GET"])
+
+@app.route("/leaderboard", methods =["POST","GET"])
 def leaderboard():
     scores = [1.0,2.0,3.0]
-    #names = ["name" : "12-31-18", " name" : "01-01-19", "name" : "01-02-19"] 
+    #names = ["name" : "12-31-18", " name" : "01-01-19", "name" : "01-02-19"]
     names = [{ "Name": "zbc", "Rank": 50 , "Score": 5000 },{ "Rank": "25", "Name": "swimming", "Score": 2043 },  { "Name": "xyz", "Rank": "2", "Score": 500 }];
 
     data = json.dumps( scores )
@@ -115,9 +109,9 @@ def user(usr):
 
 @app.route("/logged")
 def logged():
-    #flash('You were successfully logged in')
+    #flash(mess)
     return render_template("logged.html")
 
 if __name__ == "__main__":
     app.run(debug=True)
-    
+
