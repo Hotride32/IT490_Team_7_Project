@@ -94,6 +94,30 @@ def login():
 
 @app.route("/leaderboard", methods =["POST","GET"])
 def leaderboard():
+
+    credentials = pika.PlainCredentials('testuser', 'testuser')
+    #connection = pika.BlockingConnection( pika.ConnectionParameters('10.243.84.199',5672,'/',credentials)) #Steve
+    connection = pika.BlockingConnection( pika.ConnectionParameters('10.243.154.71',5672,'/',credentials)) #Z
+    channel = connection.channel()
+    channel.queue_declare(queue='user_key')
+    channel.queue_declare(queue='pass_key')
+    channel.queue_declare(queue='access')
+    
+    channel.basic_publish(exchange='', routing_key='user_key', body='getscore')
+
+
+    def callback2(ch, method, properties, body):
+              print(" [x] Received %r" % body)
+              l = body.decode('utf-8')
+              labels = json.dumps(l)
+              data = json.dumps(l)
+              #print("end of callback")
+              channel.stop_consuming()
+              return render_template("Leaderboard.html", data=data, labels=labels)
+
+    channel.basic_consume(queue='access', on_message_callback=callback2, auto_ack=True)
+    channel.start_consuming()
+
     scores = [1.0,2.0,3.0]
     #names = ["name" : "12-31-18", " name" : "01-01-19", "name" : "01-02-19"]
     names = [{ "Name": "zbc", "Rank": 50 , "Score": 5000 },{ "Rank": "25", "Name": "swimming", "Score": 2043 },  { "Name": "xyz", "Rank": "2", "Score": 500 }];
