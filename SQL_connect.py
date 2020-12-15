@@ -1,11 +1,12 @@
 import mysql.connector, pika, sys, os
 import hashlib 
-
+import json
+import collections
 
 def main():
 
     credentials = pika.PlainCredentials('testuser','testuser')
-    connection = pika.BlockingConnection(pika.ConnectionParameters('10.243.84.199',5672,'/',credentials))
+    connection = pika.BlockingConnection( pika.ConnectionParameters('10.243.84.199',5672,'/',credentials)) 
     channel = connection.channel()
 
     channel.queue_declare(queue='user_key')
@@ -50,15 +51,17 @@ def sql_query(opt, uname, pword, channel):
 	option = '%s' % opt
 	email = uname
 	password = pword
-	pword = hasher(pword)
+	#pword = hasher(pword)
 
 	print("if")
 	print(option, email, password)
 	if option == 'register':
 		print("Register")
+		pword = hasher(pword)
 		query = ("INSERT INTO accounts (email, password) VALUES(%s, %s);")
 		mycursor.execute(query, (uname, pword))
 	elif option == 'login':
+		pword = hasher(pword)
 		query = ("SELECT * FROM accounts WHERE email='%s' AND password='%s';" % (uname, pword))
 		mycursor.execute(query)
 		myresult = mycursor.fetchall()
@@ -68,9 +71,19 @@ def sql_query(opt, uname, pword, channel):
 			channel.basic_publish(exchange='',routing_key='access',body='logged')
 		else:
 			channel.basic_publish(exchange='',routing_key='access',body='invalid')
+	elif option == 'newscore':
+		print(pword)
+		score = int(pword)
+		query = ("UPDATE accounts SET score = '%d' WHERE email='%s';" % (score,uname))
+		mycursor.execute(query)
+	elif option == 'getscore':
+		query = ("SELECT JSON_OBJECT ('user', email, 'score', score) FROM accounts ORDER BY score DESC;")
+		mycursor.execute(query)
+		myresult = mycursor.fetchall()
+		print(myresult)
+		channel.basic_publish(exchange='',routing_key='access',body='%s' % myresult)
 	else:
-		print("Didnt work")
-	
+		print("Didnt work")	
 	cnx.commit()
 	cnx.close()
 	
@@ -79,7 +92,7 @@ def sql_query(opt, uname, pword, channel):
 if __name__ == '__main__':
     try:
         main()
-except KeyboardInterrupt:
+    except KeyboardInterrupt:
         print('Interrupted')
         try:
             sys.exit(0)
