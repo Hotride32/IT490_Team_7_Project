@@ -1,5 +1,6 @@
 from flask import Flask, redirect, url_for, render_template, request, json, flash
 import pika
+import re
 
 app = Flask(__name__)
 app.secret_key = "super secret key"
@@ -120,10 +121,10 @@ def leaderboard():
 
 
     if request.method == "POST":
-       if request.form.get("Enter Score"):
+       if request.form.get("score"):
           user = request.form["username"]
           password = request.form["password"]
-          score = request.form["score"]
+          score = request.form["inscore"]
           info = 'newscore' + ' ' + user + ' ' + score
           channel.basic_publish(exchange='', routing_key='user_key', body=info)
           print(user)
@@ -132,7 +133,7 @@ def leaderboard():
           #     return redirect(url_for("user", usr=user))
           #elif request.method == "GET":
           #     return render_template("index.html")
-          #return redirect(url_for("leaderboard")) 
+          return redirect(url_for("leaderboard")) 
        else:
           channel.basic_publish(exchange='', routing_key='user_key', body='getscore test test')
 
@@ -145,8 +146,23 @@ def leaderboard():
               #l[-1] = ''
               #l[-2] = ''
               #l[-3] = ''
-              newscore = (l[0]+l[3:len(l)-4]+l[-1])
-              #print(newscore)
+              regex = r"\{(.*?)\}"
+              newscore = '['
+              num = 0
+              matches = re.finditer(regex, l, re.MULTILINE | re.DOTALL)
+
+              for matchNum, match in enumerate(matches):
+                   for groupNum in range(0, len(match.groups())):
+                        if(num > 0):
+                             newscore += ","
+                        newscore += "{" + match.group(1) +'}'
+                        num+=1
+                        print (match.group(1))
+                        print(newscore)
+              newscore += ']'
+
+              #newscore = (l[0]+l[3:len(l)-4]+l[-1])
+              print(newscore)
               labels = json.loads(newscore)
               data = json.loads(newscore)
               #print("end of callback")
