@@ -12,8 +12,8 @@ def home():
 @app.route("/register", methods=["POST", "GET"])
 def register():
     credentials = pika.PlainCredentials('testuser', 'testuser')
-    #connection = pika.BlockingConnection( pika.ConnectionParameters('10.243.84.199',5672,'/',credentials)) #Steve
-    connection = pika.BlockingConnection( pika.ConnectionParameters('10.243.154.71',5672,'/',credentials)) #Z
+    connection = pika.BlockingConnection( pika.ConnectionParameters('10.243.84.199',5672,'/',credentials)) #Steve
+    #connection = pika.BlockingConnection( pika.ConnectionParameters('10.243.154.71',5672,'/',credentials)) #Z
     channel = connection.channel()
     channel.queue_declare(queue='user_key')
     channel.queue_declare(queue='pass_key')
@@ -46,8 +46,8 @@ def register():
 @app.route("/login", methods=["POST", "GET"])
 def login():
     credentials = pika.PlainCredentials('testuser', 'testuser')
-    #connection = pika.BlockingConnection( pika.ConnectionParameters('10.243.84.199',5672,'/',credentials)) #Steve
-    connection = pika.BlockingConnection( pika.ConnectionParameters('10.243.154.71',5672,'/',credentials)) #Z
+    connection = pika.BlockingConnection( pika.ConnectionParameters('10.243.84.199',5672,'/',credentials)) #Steve
+    #connection = pika.BlockingConnection( pika.ConnectionParameters('10.243.154.71',5672,'/',credentials)) #Z
     channel = connection.channel()
     message = '';
     channel.queue_declare(queue='user_key')
@@ -96,36 +96,89 @@ def login():
 def leaderboard():
 
     credentials = pika.PlainCredentials('testuser', 'testuser')
-    #connection = pika.BlockingConnection( pika.ConnectionParameters('10.243.84.199',5672,'/',credentials)) #Steve
-    connection = pika.BlockingConnection( pika.ConnectionParameters('10.243.154.71',5672,'/',credentials)) #Z
+    connection = pika.BlockingConnection( pika.ConnectionParameters('10.243.84.199',5672,'/',credentials)) #Steve
+    #connection = pika.BlockingConnection( pika.ConnectionParameters('10.243.154.71',5672,'/',credentials)) #Z
     channel = connection.channel()
     channel.queue_declare(queue='user_key')
     channel.queue_declare(queue='pass_key')
     channel.queue_declare(queue='access')
     
-    channel.basic_publish(exchange='', routing_key='user_key', body='getscore')
+    #channel.basic_publish(exchange='', routing_key='user_key', body='getscore')
 
 
-    def callback2(ch, method, properties, body):
+    #def callback2(ch, method, properties, body):
+              #print(" [x] Received %r" % body)
+              #l = body.decode('utf-8')
+              #labels = json.dumps(l)
+              #data = json.dumps(l)
+              #print("end of callback")
+              #channel.stop_consuming()
+              #return render_template("Leaderboard.html", data=data, labels=labels)
+
+    #channel.basic_consume(queue='access', on_message_callback=callback2, auto_ack=True)
+    #channel.start_consuming()
+
+
+    if request.method == "POST":
+       if request.form.get("Enter Score"):
+          user = request.form["username"]
+          password = request.form["password"]
+          score = request.form["score"]
+          info = 'newscore' + ' ' + user + ' ' + score
+          channel.basic_publish(exchange='', routing_key='user_key', body=info)
+          print(user)
+          channel.basic_publish(exchange='', routing_key='pass_key', body=password)
+          #connection.close()
+          #     return redirect(url_for("user", usr=user))
+          #elif request.method == "GET":
+          #     return render_template("index.html")
+          #return redirect(url_for("leaderboard")) 
+       else:
+          channel.basic_publish(exchange='', routing_key='user_key', body='getscore test test')
+
+
+          def callback2(ch, method, properties, body):
               print(" [x] Received %r" % body)
               l = body.decode('utf-8')
-              labels = json.dumps(l)
-              data = json.dumps(l)
+              #l[1] = ''
+              #l[2] = ''
+              #l[-1] = ''
+              #l[-2] = ''
+              #l[-3] = ''
+              newscore = (l[0]+l[3:len(l)-4]+l[-1])
+              #print(newscore)
+              labels = json.loads(newscore)
+              data = json.loads(newscore)
               #print("end of callback")
               channel.stop_consuming()
-              return render_template("Leaderboard.html", data=data, labels=labels)
+              #connection.close()
+              #return render_template("Leaderboard.html", data=data, labels=labels)
+              callback2.y = newscore
+              return newscore
 
-    channel.basic_consume(queue='access', on_message_callback=callback2, auto_ack=True)
-    channel.start_consuming()
+          diction = channel.basic_consume(queue='access', on_message_callback=callback2, auto_ack=True)
+          channel.start_consuming()
+          dict = json.loads(callback2.y)
+          print(dict)
+          data = json.dumps(dict)
+          labels = json.dumps(dict)
 
-    scores = [1.0,2.0,3.0]
-    #names = ["name" : "12-31-18", " name" : "01-01-19", "name" : "01-02-19"]
-    names = [{ "Name": "zbc", "Rank": 50 , "Score": 5000 },{ "Rank": "25", "Name": "swimming", "Score": 2043 },  { "Name": "xyz", "Rank": "2", "Score": 500 }];
+          connection.close()
+          return render_template("Leaderboard.html", data=data, labels=labels)
 
-    data = json.dumps( scores )
-    labels = json.dumps( names )
-    #print(labels)
-    return render_template("Leaderboard.html", data=data, labels=labels)
+
+    elif request.method == "GET":
+          #return render_template("Leaderboard.html")
+
+
+          scores = [1.0,2.0,3.0]
+          #names = ["name" : "12-31-18", " name" : "01-01-19", "name" : "01-02-19"]
+          names = [{ "Name": "zbc", "Rank": 50 , "Score": 5000 },{ "Rank": "25", "Name": "swimming", "Score": 2043 },  { "Name": "xyz", "Rank": "2", "Score": 500 }];
+
+          data = json.dumps( scores )
+          labels = json.dumps( names )
+          print(labels)
+          return render_template("Leaderboard.html", data=data, labels=labels)
 
 @app.route("/<usr>")
 def user(usr):
